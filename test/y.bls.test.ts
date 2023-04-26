@@ -39,6 +39,7 @@ describe('bls account', function () {
   let account1: BLSAccount
   let account2: BLSAccount
   let accountDeployer: BLSAccountFactory
+
   before(async () => {
     entrypoint = await deployEntryPoint()
     const BLSOpenLib = await new BLSOpen__factory(ethers.provider.getSigner()).deploy()

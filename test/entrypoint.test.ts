@@ -880,6 +880,7 @@ describe('EntryPoint', function () {
         await ethersSigner.sendTransaction({ to: aggAccount.address, value: parseEther('0.1') })
         await ethersSigner.sendTransaction({ to: aggAccount2.address, value: parseEther('0.1') })
       })
+      
       it('should fail to execute aggregated account without an aggregator', async () => {
         const userOp = await fillAndSign({
           sender: aggAccount.address
