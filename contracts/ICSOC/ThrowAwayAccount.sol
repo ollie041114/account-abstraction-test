@@ -20,9 +20,7 @@ contract ThrowawayAccount {
         bytes memory txData
     ) public onlyOwner returns (bool) {
         // Forward the call to the target contract with API function hash and arguments
-        console.log("Throwaway is this ");
         (bool success, ) = contractAddr.call(txData);
-        console.log("Throwaway: ", success);
 
         // Return true if the call was successful, false otherwise
         return success;

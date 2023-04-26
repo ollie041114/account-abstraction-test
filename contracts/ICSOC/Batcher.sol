@@ -26,7 +26,6 @@ contract Batcher {
 
         // Store the throwawayAccount address in the mapping
         throwawayAccounts[enrollee] = address(throwawayAccountInstance);
-        // console.log(throwawayAccounts[enrollee]);
     }
 
     
@@ -56,9 +55,11 @@ contract Batcher {
         for (uint256 i = 0; i < txArray.length; ++i) {
             msgHash = keccak256(abi.encodePacked(txArray[i], batchernonce));
 
+
             msgSender = verify(msgHash, sigs[i]);
 
             address throwawayAccountAddr = throwawayAccounts[msgSender];
+
 
             bool success = ThrowawayAccount(throwawayAccountAddr).executeTransaction(contractAddrs[i], txArray[i]);
             require(success, "Transaction execution failed");

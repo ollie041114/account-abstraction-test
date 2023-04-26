@@ -58,9 +58,9 @@ contract ThanksPay {
         address workerAddress,
         address companyAddress,
         uint256 monthlySalary
-    ) external onlyOwner {
-        require(!workerApproval[workerAddress], "Worker already enrolled.");
-        require(companyApproval[companyAddress], "Company not enrolled.");
+    ) external {
+        // require(!workerApproval[workerAddress], "Worker already enrolled.");
+        // require(companyApproval[companyAddress], "Company not enrolled.");
 
         workers[workerAddress].approval = true;
         workers[workerAddress].withdrawableBalance = monthlySalary;
@@ -79,12 +79,12 @@ contract ThanksPay {
         address companyAddress,
         uint8 _salaryDay,
         uint256 initialChargeableBalance
-    ) external onlyOwner {
-        require(
-            !companies[companyAddress].approval,
-            "Company already enrolled."
-        );
-        require(_salaryDay > 0 && _salaryDay <= 31, "Invalid salary day.");
+    ) external {
+        // require(
+        //     !companies[companyAddress].approval,
+        //     "Company already enrolled."
+        // );
+        // require(_salaryDay > 0 && _salaryDay <= 31, "Invalid salary day.");
 
         companyApproval[companyAddress] = true;
         companies[companyAddress].approval = true;
@@ -93,18 +93,18 @@ contract ThanksPay {
     }
 
     function requestSalaryAdvance(uint256 amount) external onlyEnrolled {
-        require(workers[msg.sender].approval, "Worker not registered.");
+        // require(workers[msg.sender].approval, "Worker not registered.");
         Worker storage worker = workers[msg.sender];
         Company storage company = companies[worker.companyAddress];
 
-        require(
-            worker.withdrawableBalance >= amount,
-            "Worker balance is not sufficient."
-        );
-        require(
-            company.chargeableBalance >= amount,
-            "Company chargeable balance is not sufficient."
-        );
+        // require(
+        //     worker.withdrawableBalance >= amount,
+        //     "Worker balance is not sufficient."
+        // );
+        // require(
+        //     company.chargeableBalance >= amount,
+        //     "Company chargeable balance is not sufficient."
+        // );
 
         uint256 bonusFee = (amount * 5) / 100;
         require(
@@ -127,8 +127,8 @@ contract ThanksPay {
     function increaseChargeableBalance(
         address companyAddress,
         uint256 amount
-    ) external onlyEnrolled {
-        require(companies[companyAddress].approval, "Company not registered.");
+    ) external {
+        // require(companies[companyAddress].approval, "Company not registered.");
 
         uint256 totalAmount = amount +
             companies[companyAddress].serviceFeePoints;
@@ -144,7 +144,7 @@ contract ThanksPay {
     }
 
     function updateWithdrawableBalance() external onlyEnrolled {
-        require(workerApproval[msg.sender], "Worker not registered.");
+        // require(workerApproval[msg.sender], "Worker not registered.");
         Worker storage worker = workers[msg.sender];
         Company storage company = companies[worker.companyAddress];
 
@@ -153,7 +153,7 @@ contract ThanksPay {
         }
     }
 
-    function salaryDay(address[] calldata workerAddresses) external onlyOwner {
+    function salaryDay(address[] calldata workerAddresses) external {
         for (uint256 i = 0; i < workerAddresses.length; i++) {
             address workerAddress = workerAddresses[i];
             require(workers[workerAddress].approval, "Worker not registered.");
