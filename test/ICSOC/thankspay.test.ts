@@ -3,7 +3,7 @@ import { Signer } from "ethers";
 const { expect } = require("chai");
 
 
-describe.only("ThanksPay", function () {
+describe("ThanksPay", function () {
     let Batcher, batcher: any, ThanksPay, thanksPay: any, creditPointsToken, owner: Signer, addr1: Signer, addr2: Signer, addr3: Signer, addr4: Signer, addr5: Signer, addrsRand: Signer, addrs: Signer;
 
     let gas1, gas2;
@@ -37,7 +37,7 @@ describe.only("ThanksPay", function () {
 
     async function calculateGasCost(tx) {
         const receipt = await tx.wait();
-        const gasUsed = receipt.gasUsed;
+        const gasUsed = receipt.gasUsed*1;
         //const gasPrice = (await tx.getTransaction()).gasPrice;
         return gasUsed;
     }
@@ -98,15 +98,6 @@ describe.only("ThanksPay", function () {
         gas1 = finalCost * 5
 
         console.log("Final gas 1 cost:", gas1);
-
-        // Check final balances and ensure the scenario is executed as expected
-        //     for (let i = 0; i < workerMonthlySalaries.length; i++) {
-        //       let worker = await thanksPay.workers(addrs[i].address);
-        //       expect(worker.withdrawableBalance).to.equal(worker.monthlySalary);
-        //     }
-
-        //     let companyA = await thanksPay.companies(addr1.address);
-        //     expect(companyA.chargeableBalance.add(finalCost)).to.be.closeTo(ethers.utils.parseEther("84.25"), 10000);
     });
 
 
@@ -186,10 +177,6 @@ describe.only("ThanksPay", function () {
 
         console.log("Final gas 2 cost: ", gas2);
         console.log("Ratio: ", gas1 / gas2);
-        // Verify the accounts are enrolled in the ThanksPay contract
-        // const enrolled = await thanksPay.workers(addrs[0].address);
-        // expect(enrolled.company).to.equal(addr1.address);
-        // expect(enrolled.monthlySalary).to.equal(ethers.utils.parseEther("5"));
     });
 
 
@@ -268,7 +255,7 @@ describe.only("ThanksPay", function () {
 
             // Sign txData with corresponding accounts
             const signedDataPromises = newTxDataArray.map(async (txData, index) => {
-            const hash = ethers.utils.solidityKeccak256(['bytes', 'uint256'], [txData.data, batcherNonce]);
+            const hash = ethers.utils.solidityKeccak256(['bytes', 'bytes32'], [txData.data, batcherNonce]);
             const signer = signersForTx[index];
 
             const signature = await signer.signMessage(ethers.utils.arrayify(hash));
@@ -290,7 +277,4 @@ describe.only("ThanksPay", function () {
         console.log("Final gas 2 cost: ", gas2);
         console.log("Ratio: ", gas1 / gas2);
     })
-
-
-
 });

@@ -16,6 +16,7 @@ contract Batcher {
 
         // Mapping to store each account's unique ThrowawayAccount
     mapping(address => address) public throwawayAccounts;
+    bytes32 public prevHash;
 
     function enroll(address enrollee) public {
         // Ensure there isn't already a ThrowawayAccount for this msgSender
@@ -40,28 +41,21 @@ contract Batcher {
         return txArray;
     }
 
-        // The updated `dispatch` function, now named `executeTransactions`
+    // The updated `dispatch` function, now named `executeTransactions`
     function executeTransactions(
-        address[] memory contractAddrs,
-        bytes[] memory txArray,
-        uint256 batchernonce, 
-        bytes[] memory sigs
-        ) public {
+        address contractAddr,
+        bytes[] calldata txArray,
+        bytes[] calldata sigs
+    ) public {
         address msgSender;
-        bytes32 msgHash;
-        // Enforce the msgSender has a ThrowawayAccount
-        // require(throwawayAccounts[msg.sender] != address(0), "The dispatcher needs to be enrolled");
+        bytes32 hash;
 
         for (uint256 i = 0; i < txArray.length; ++i) {
-            msgHash = keccak256(abi.encodePacked(txArray[i], batchernonce));
-
-
-            msgSender = verify(msgHash, sigs[i]);
-
+            hash = keccak256(abi.encodePacked(txArray[i]));
+            msgSender = verify(hash, sigs[i]);
             address throwawayAccountAddr = throwawayAccounts[msgSender];
 
-
-            bool success = ThrowawayAccount(throwawayAccountAddr).executeTransaction(contractAddrs[i], txArray[i]);
+            bool success = ThrowawayAccount(throwawayAccountAddr).executeTransaction(contractAddr, txArray[i]);
             require(success, "Transaction execution failed");
         }
     }

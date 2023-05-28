@@ -1,0 +1,33 @@
+@startuml async
+skinparam maxMessageSize 220
+
+participant Owner
+
+box "Local Network" #LightGray
+participant "Target Smart Contract" as LocalBlockchain
+end box
+
+box "Public Network" #LightGray
+participant "Batcher Smart Contract" as PublicBatcher
+participant "Proxy Account" as PublicProxy
+participant "Target Smart Contract" as PublicTarget
+end box
+
+
+== Asynchronously ==
+box Asynchronously
+Owner -> PublicBatcher : Send batch to public network (txData[], sig_user[], batchNonce)
+loop i = 0; i <= n times
+  PublicBatcher -> PublicBatcher: positionNonce = i
+  PublicBatcher -> PublicBatcher: user_address = verify sig_user over (txData[i], batchNonce, positionNonce)
+  PublicBatcher -> PublicProxy : Delegate txCall to ProxyAccount(user_address)
+  PublicProxy -> PublicTarget : Call target smart contract
+  PublicTarget --> PublicProxy : Accept changes
+  PublicProxy --> PublicBatcher : Return true
+end
+PublicBatcher -> PublicBatcher: Save the hash over the executed transactions \n hashes[batchNonce] = hash(txData[])
+PublicBatcher -> Owner: emit the event
+Owner -> Owner : batchNonce++
+end box
+
+@enduml

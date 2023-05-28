@@ -17,9 +17,8 @@ contract ThrowawayAccount {
 
     function executeTransaction(
         address contractAddr,
-        bytes memory txData
+        bytes calldata txData
     ) public onlyOwner returns (bool) {
-        // Forward the call to the target contract with API function hash and arguments
         (bool success, ) = contractAddr.call(txData);
 
         // Return true if the call was successful, false otherwise

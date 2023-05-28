@@ -1,6 +1,8 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "hardhat/console.sol";
+
 
 contract ThanksPay {
     address public owner;
@@ -97,16 +99,8 @@ contract ThanksPay {
         Worker storage worker = workers[msg.sender];
         Company storage company = companies[worker.companyAddress];
 
-        // require(
-        //     worker.withdrawableBalance >= amount,
-        //     "Worker balance is not sufficient."
-        // );
-        // require(
-        //     company.chargeableBalance >= amount,
-        //     "Company chargeable balance is not sufficient."
-        // );
-
         uint256 bonusFee = (amount * 5) / 100;
+        
         require(
             company.chargeableBalance >= amount + bonusFee,
             "Company chargeable balance isn't enough to cover bonus fee."
@@ -116,10 +110,10 @@ contract ThanksPay {
         company.chargeableBalance -= amount + bonusFee;
         company.serviceFeePoints += bonusFee;
 
-        // Reward worker with creditPoints as per your rewards policy
-        // Define the amount of creditPoints to be rewarded
-        uint256 creditPointsReward = 0;
-        creditPointsToken.transfer(msg.sender, creditPointsReward);
+        // // Reward worker with creditPoints as per your rewards policy
+        // // Define the amount of creditPoints to be rewarded
+        // uint256 creditPointsReward = 0;
+        // creditPointsToken.transfer(msg.sender, creditPointsReward);
 
         emit RequestProcessed(msg.sender, worker.companyAddress, amount);
     }
@@ -130,8 +124,7 @@ contract ThanksPay {
     ) external {
         // require(companies[companyAddress].approval, "Company not registered.");
 
-        uint256 totalAmount = amount +
-            companies[companyAddress].serviceFeePoints;
+        uint256 totalAmount = amount + companies[companyAddress].serviceFeePoints;
 
         companies[companyAddress].chargeableBalance += amount;
         companies[companyAddress].serviceFeePoints = 0;
