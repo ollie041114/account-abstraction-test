@@ -14,14 +14,16 @@ async function calculateGasCost(tx) {
     return gasUsed;
 }
 
-async function createAndExecuteBatch(hash, thanksPay, batcher, owner, func, paramsList, signerList) {
+async function createAndExecuteBatch(thanksPay, batcher, owner, func, paramsList, signerList) {
     const txDataPromises = paramsList.map((params) => func(...params));
     const txDataArray = await Promise.all(txDataPromises);
     const contractAddrs = thanksPay.address;
     const encodedTransactions = txDataArray.map((tx) => tx.data);
 
+    let hash;
+
     const signedDataPromises = txDataArray.map(async (txData, index) => {
-        hash = ethers.utils.solidityKeccak256(['bytes', 'bytes32'], [txData.data, hash]);
+        hash = ethers.utils.solidityKeccak256(['bytes'], [txData.data]);
         const signer = signerList[index];
         const signature = await signer.signMessage(ethers.utils.arrayify(hash));
         return signature;
@@ -51,7 +53,7 @@ async function enrollInBatcher(batcher, accounts) {
 }
 
 
-describe("ThanksPay Test 2", function () {
+describe.only("ThanksPay Test 2", function () {
     let Batcher, batcher: any, ThanksPay, thanksPay: any, creditPointsToken, owner: Signer, addr1: Signer, addr2: Signer, addr3: Signer, addr4: Signer, addr5: Signer, addrsRand: Signer, addrs: Signer;
 
     let gas1, gas2;
@@ -68,7 +70,7 @@ describe("ThanksPay Test 2", function () {
         let hash = ethers.utils.solidityKeccak256(['uint256'], [1]);
 
         Batcher = await ethers.getContractFactory("Batcher");
-        batcher = await Batcher.deploy(hash);
+        batcher = await Batcher.deploy();
         await batcher.deployed();
 
         [owner, addr1, addr2, addr3, addr4, addr5, ...addrsRand] = await ethers.getSigners();
@@ -194,14 +196,11 @@ describe("ThanksPay Test 2", function () {
                 "size": i
             })
 
-            let hash = ethers.utils.solidityKeccak256(['uint256'], [1]);
-
             // Execute batches
             for (const batch of batches) {
                 try {
                     let gasUsed: any = 0;
-                    const response = await createAndExecuteBatch(hash, thanksPay, batcher, owner, batch.func, batch.paramsList, batch.signerList);
-                    hash = response.hash;
+                    const response = await createAndExecuteBatch(thanksPay, batcher, owner, batch.func, batch.paramsList, batch.signerList);
                     gasUsed = response.gasUsed;
                     gasCosts[gasCosts.length - 1][batch.name] = gasUsed / i;
                     const gasCost = gasUsed / i;

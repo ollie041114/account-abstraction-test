@@ -5,7 +5,7 @@ async function getSigners(owner, amount) {
     for (let i = 0; i < amount; i++) {
         let wallet = ethers.Wallet.createRandom();
         wallet = wallet.connect(ethers.provider);
-        await owner.sendTransaction({to: wallet.address, value: ethers.utils.parseEther('1')});
+        await owner.sendTransaction({ to: wallet.address, value: ethers.utils.parseEther('1') });
         signers.push(wallet);
     }
     return signers;
@@ -32,13 +32,32 @@ async function runBatchTests(functionsToTest, batcherContract, testContract, sig
     const gasCosts = [];
     for (const f of functionData) {
         const callResult = await createAndExecuteBatch(batcherContract, testContract, signers[0], f.paramsList, f.func, f.signerList);
-        gasCosts.push({name: f.name, gasUsed: callResult.gasUsed / callResult.paramsList.length});
+        gasCosts.push({ name: f.name, gasUsed: callResult.gasUsed / callResult.paramsList.length });
     }
     return gasCosts;
 }
 
-async function createAndExecuteBatch(batcher, contract, owner, paramsList, func, signerList) {
-    // ... same code as in the original function ...
+async function createAndExecuteBatch(hash, thanksPay, batcher, owner, func, paramsList, signerList) {
+    const txDataPromises = paramsList.map((params) => func(...params));
+    const txDataArray = await Promise.all(txDataPromises);
+    const contractAddrs = thanksPay.address;
+    const encodedTransactions = txDataArray.map((tx) => tx.data);
+
+    const signedDataPromises = txDataArray.map(async (txData, index) => {
+        hash = ethers.utils.solidityKeccak256(['bytes', 'bytes32'], [txData.data, hash]);
+        const signer = signerList[index];
+        const signature = await signer.signMessage(ethers.utils.arrayify(hash));
+        return signature;
+    });
+
+    const sigs = await Promise.all(signedDataPromises);
+    const tx = await batcher.connect(owner).executeTransactions(contractAddrs, encodedTransactions, sigs);
+    const receipt = await tx.wait();
+
+    return {
+        gasUsed: receipt.gasUsed,
+        hash: hash,
+    };
 }
 
 function saveGasCostsToFile(gasCosts, filename) {
