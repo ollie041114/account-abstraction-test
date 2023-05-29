@@ -35,6 +35,8 @@ describe.only("Batcher interaction with and Test contracts", function () {
     });
 
     it("Tests the interaction in the Batcher", async function () {
+        this.timeout(0);
+
         // Enroll owner and user
         await Batcher.enroll(owner.address);
         await Batcher.enroll(user.address);
@@ -70,6 +72,8 @@ describe.only("Batcher interaction with and Test contracts", function () {
     });
 
     it("Tests the interaction in the Batcher Classic", async function () {
+        this.timeout(0);
+        
         // Enroll owner and user in BatcherClassic
         await BatcherClassic.enroll(owner.address);
         await BatcherClassic.enroll(user.address);

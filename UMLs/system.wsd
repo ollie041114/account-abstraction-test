@@ -9,7 +9,7 @@ participant "Target Smart Contract" as LocalBlockchain
 end box
 
 box "Public Network" #LightGray
-participant "Batcher Smart Contract" as PublicBatcher
+participant "Relayer Smart Contract" as PublicRelayer
 end box
 
 User -> Owner : Initiate request
@@ -22,15 +22,15 @@ User -> Owner : Request sig_owner
 
 Owner -> User : sig_owner = sign(txData, batchNonce, positionNonce)
 note right : Has private key
-User -> Owner : sign_user
-Owner -> LocalBlockchain : Send (txData, batchNonce, signature_user)
+User -> Owner : sig_user
+Owner -> LocalBlockchain : Send (txData, batchNonce, sig_user)
 LocalBlockchain -> Owner : Update state & emit events
 Owner -> User : Return result
 Owner -> Owner : Save to a batch \n positionNonce++
 
 == Asynchronously ==
 box Asynchronously
-Owner -> PublicBatcher : Send batch to public network (txData[], sig_user[], batchNonce)
+Owner -> PublicRelayer : Send batch to public network (txData[], sig_user[], batchNonce)
 Owner -> Owner : batchNonce++
 end box
 

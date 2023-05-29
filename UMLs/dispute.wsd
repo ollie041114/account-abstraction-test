@@ -4,31 +4,31 @@ skinparam ParticipantPadding 70
 
 participant User
 participant Owner
-participant Batcher
+participant Relayer
 
-Batcher -> Batcher: Store batchHash (txData[])
+Relayer -> Relayer: Store batchHash (txData[])
 
-User -> Batcher: Check if transactions executed correctly
+User -> Relayer: Check if transactions executed correctly
 alt if user's txData was not included
-    User -> Batcher: openDispute (txData, nonceId, batchId, ownerSignature) + **deposit**
-    Batcher -> Batcher: verify owner's signature
+    User -> Relayer: openDispute (txData, positionNonce, batchNonce, ownerSignature) + **deposit**
+    Relayer -> Relayer: verify owner's signature
     alt if owner's signature is valid
-        Batcher -> Owner: event - notify about opened dispute
-        Owner -> Batcher: submit (txDataArray[]) used to create batch
+        Relayer -> Owner: event - notify about opened dispute
+        Owner -> Relayer: submit (txDataArray[]) used to create batch
 
-        Batcher -> Batcher: verify if user's txData \n was included in the txDataArray[]
-        note left: hash(txDataArray[nonceId])) \n == hash(txData) ?
-        Batcher -> Batcher: verify if txDataArray[] is valid against batch hash 
+        Relayer -> Relayer: verify if user's txData \n was included in the txDataArray[]
+        note left: hash(txDataArray[positionNonce])) \n == hash(txData) ?
+        Relayer -> Relayer: verify if txDataArray[] is valid against batch hash 
         note left: hash(txData[])== hashes[batchNonce] ?
 
         alt if txDataArray is valid
-            Batcher -> Owner: Close dispute
-            Owner -> Batcher: claim DisputeCompensation (**deposit**)
-            Batcher -> Owner: Transfer compensation
+            Relayer -> Owner: Close dispute
+            Owner -> Relayer: claim DisputeCompensation (**deposit**)
+            Relayer -> Owner: Transfer compensation
        else if txDataArray[] not valid
-            Batcher -> User: Wait for claimDisputeCompensation
-            User -> Batcher: claim DisputeCompensation (2 x **deposit**)
-            Batcher -> User: Transfer compensation
+            Relayer -> User: Wait for claimDisputeCompensation
+            User -> Relayer: claim DisputeCompensation (2 x **deposit**)
+            Relayer -> User: Transfer compensation
         end
     end
 end

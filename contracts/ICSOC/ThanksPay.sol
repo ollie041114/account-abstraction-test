@@ -110,11 +110,6 @@ contract ThanksPay {
         company.chargeableBalance -= amount + bonusFee;
         company.serviceFeePoints += bonusFee;
 
-        // // Reward worker with creditPoints as per your rewards policy
-        // // Define the amount of creditPoints to be rewarded
-        // uint256 creditPointsReward = 0;
-        // creditPointsToken.transfer(msg.sender, creditPointsReward);
-
         emit RequestProcessed(msg.sender, worker.companyAddress, amount);
     }
 

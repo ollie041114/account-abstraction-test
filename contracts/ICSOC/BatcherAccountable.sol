@@ -67,7 +67,7 @@ contract BatcherAccountable {
         bytes32 Msg;
         for (uint256 i = 0; i < txArray.length; ++i) {
             Msg = keccak256(abi.encodePacked(txArray[i], batchNonce, i));
-            msgSender = msg.sender;
+            msgSender = verify(Msg, sigs[i]);
             address throwawayAccountAddr = throwawayAccounts[msgSender];
 
             bool success = ThrowawayAccount(throwawayAccountAddr)
