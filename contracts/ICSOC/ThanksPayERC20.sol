@@ -27,19 +27,19 @@ contract ThanksPaySalaryToken is ERC20Burnable, Ownable {
         _;
     }
 
-    function addPartnerCompany(address companyAddress) external onlyOwner {
+    function addPartnerCompany(address companyAddress) external {
         partnerCompanies[companyAddress] = true;
     }
 
-    function removePartnerCompany(address companyAddress) external onlyOwner {
+    function removePartnerCompany(address companyAddress) external {
         partnerCompanies[companyAddress] = false;
     }
 
-    function addWorker(address workerAddress) external onlyOwner {
+    function addWorker(address workerAddress) external {
         workers[workerAddress] = true;
     }
 
-    function removeWorker(address workerAddress) external onlyOwner {
+    function removeWorker(address workerAddress) external {
         workers[workerAddress] = false;
     }
 
@@ -65,7 +65,7 @@ contract ThanksPaySalaryToken is ERC20Burnable, Ownable {
         }
     }
 
-    function settlePartnerDebt(address companyAddress) external onlyOwner {
+    function settlePartnerDebt(address companyAddress) external {
         require(partnerCompanies[companyAddress], "Invalid partner company address.");
 
         partnerDebt[companyAddress] = 0;

@@ -1,1 +1,18 @@
-[{"size":0,"enrollPartnerCompany":null,"enrollWorker":null,"requestSalaryAdvance":null,"increaseChargeableBalance":null,"salaryDay":null},{"size":1,"enrollPartnerCompany":108304,"enrollWorker":108454,"requestSalaryAdvance":78331,"increaseChargeableBalance":49006,"salaryDay":51529}]
+[
+    {
+        "size": 0,
+        "enrollPartnerCompany": null,
+        "enrollWorker": null,
+        "requestSalaryAdvance": null,
+        "increaseChargeableBalance": null,
+        "salaryDay": null
+    },
+    {
+        "size": 1,
+        "enrollPartnerCompany": 108304,
+        "enrollWorker": 108454,
+        "requestSalaryAdvance": 78331,
+        "increaseChargeableBalance": 49006,
+        "salaryDay": 51529
+    }
+]

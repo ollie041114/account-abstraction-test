@@ -54,6 +54,7 @@ contract Batcher {
             hash = keccak256(abi.encodePacked(txArray[i]));
             msgSender = verify(hash, sigs[i]);
             address throwawayAccountAddr = throwawayAccounts[msgSender];
+            
 
             bool success = ThrowawayAccount(throwawayAccountAddr).executeTransaction(contractAddr, txArray[i]);
             require(success, "Transaction execution failed");
@@ -61,7 +62,7 @@ contract Batcher {
     }
 
     function verify(bytes32 msgHash, bytes memory sig) public pure returns (address) {
-        require(sig.length == 65);
+        require(sig.length == 65, "Invalid signature length");
         bytes32 r;
         bytes32 s;
         uint8 v;

@@ -111,7 +111,7 @@ contract BatcherAccountable {
             keccak256(abi.encodePacked(txDataArray[nonceId])) ==
                 keccak256(abi.encodePacked(txData)),
             "txData does not match"
-        ); 
+        );
         require(
             keccak256(abi.encode(txDataArray)) == batchHashes[currentBatchNonce]
         );

@@ -53,7 +53,7 @@ async function enrollInBatcher(batcher, accounts) {
 }
 
 
-describe.only("ThanksPay Test 2", function () {
+describe("ThanksPay Test 2", function () {
     let Batcher, batcher: any, ThanksPay, thanksPay: any, creditPointsToken, owner: Signer, addr1: Signer, addr2: Signer, addr3: Signer, addr4: Signer, addr5: Signer, addrsRand: Signer, addrs: Signer;
 
     let gas1, gas2;
