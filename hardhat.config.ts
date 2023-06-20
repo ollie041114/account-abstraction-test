@@ -3,15 +3,15 @@ import '@typechain/hardhat'
 import { HardhatUserConfig } from 'hardhat/config'
 import 'hardhat-deploy'
 import '@nomiclabs/hardhat-etherscan'
+require("dotenv").config();
 
 import 'solidity-coverage'
 
 import * as fs from 'fs'
 
-const mnemonicFileName = process.env.MNEMONIC_FILE ?? `${process.env.HOME}/.secret/testnet-mnemonic.txt`
-let mnemonic = 'test '.repeat(11) + 'junk'
-if (fs.existsSync(mnemonicFileName)) { mnemonic = fs.readFileSync(mnemonicFileName, 'ascii') }
+const mnemonic = process.env.MNEMONIC ? process.env.MNEMONIC : "MNEMONIC NOT FOUND!"
 
+console.log(mnemonic);
 function getNetwork1 (url: string): { url: string, accounts: { mnemonic: string } } {
   return {
     url,

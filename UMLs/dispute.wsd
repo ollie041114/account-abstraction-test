@@ -6,28 +6,30 @@ participant User
 participant Owner
 participant Relayer
 
+
 Relayer -> Relayer: Store batchHash (txData[])
+
 
 User -> Relayer: Check if transactions executed correctly
 alt if user's txData was not included
-    User -> Relayer: openDispute (txData, positionNonce, batchNonce, ownerSignature) + **deposit**
-    Relayer -> Relayer: verify owner's signature
+    User -> Relayer: openDispute (txData, positionNonce, batchNonce, sendTimestamp, ownerSignature) + **deposit**
+    Relayer -> Relayer: verify owner's signature \n\nverify block.timestamp > sendTimestamp 
     alt if owner's signature is valid
         Relayer -> Owner: event - notify about opened dispute
         Owner -> Relayer: submit (txDataArray[]) used to create batch
 
         Relayer -> Relayer: verify if user's txData \n was included in the txDataArray[]
         note left: hash(txDataArray[positionNonce])) \n == hash(txData) ?
-        Relayer -> Relayer: verify if txDataArray[] is valid against batch hash 
+        Relayer -> Relayer: verify if txDataArray[] is valid against batch hash
         note left: hash(txData[])== hashes[batchNonce] ?
 
         alt if txDataArray is valid
             Relayer -> Owner: Close dispute
             Owner -> Relayer: claim DisputeCompensation (**deposit**)
             Relayer -> Owner: Transfer compensation
-       else if txDataArray[] not valid
+        else if txDataArray[] not valid
             Relayer -> User: Wait for claimDisputeCompensation
-            User -> Relayer: claim DisputeCompensation (2 x **deposit**)
+            User -> Relayer: claim DisputeCompensation (**deposit + compensation** )
             Relayer -> User: Transfer compensation
         end
     end

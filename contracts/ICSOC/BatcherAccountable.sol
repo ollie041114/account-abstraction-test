@@ -10,8 +10,36 @@ contract BatcherAccountable {
     address private _throwawayAccount;
     address private _owner;
 
-    constructor() {
+    uint256 depositFunds;
+
+    constructor() payable {
+        require(
+            msg.value == 1 ether,
+            "Must send 1 ETH to initialize BatcherAccountable"
+        );
+        depositFunds = msg.value;
         _owner = msg.sender;
+    }
+
+    function fund() external payable {
+        require(
+            msg.value == 1 ether,
+            "Must send 1 ETH to fund BatcherAccountable"
+        );
+        depositFunds += msg.value;
+    }
+
+    modifier onlyIfFunded() {
+        uint256 gasRemaining = gasleft();
+        require(
+            address(this).balance >= 1 ether,
+            "BatcherAccountable must have enough funds to pay out deposits"
+        );
+        uint256 gasRemaining2 = gasleft();
+        uint256 gasConsumed = gasRemaining - gasRemaining2;
+        console.log("Gas consumed by the function");
+        console.log(gasConsumed);
+        _;
     }
 
     mapping(address => address) public throwawayAccounts;
@@ -62,7 +90,8 @@ contract BatcherAccountable {
         bytes[] calldata txArray,
         bytes[] calldata sigs,
         uint256 batchNonce
-    ) public {
+    ) public onlyIfFunded()
+    {
         address msgSender;
         bytes32 Msg;
         for (uint256 i = 0; i < txArray.length; ++i) {
@@ -70,8 +99,7 @@ contract BatcherAccountable {
             msgSender = verify(Msg, sigs[i]);
             address throwawayAccountAddr = throwawayAccounts[msgSender];
 
-            bool success = ThrowawayAccount(throwawayAccountAddr)
-                .executeTransaction(contractAddr, txArray[i]);
+            bool success = ThrowawayAccount(throwawayAccountAddr).executeTransaction(contractAddr, txArray[i]);
             require(success, "Transaction execution failed");
         }
         batchHashes[batchNonce] = keccak256(abi.encode(txArray));
@@ -82,13 +110,25 @@ contract BatcherAccountable {
         bytes calldata txData,
         uint256 nonceId,
         uint256 batchId,
+        uint256 commitTimestamp,
         bytes calldata ownerSignature
     ) public payable {
         require(msg.value == 0.5 ether, "Must send 0.5 ETH to open a dispute");
-        require(batchId == currentBatchNonce, "Invalid batchId for dispute");
+        // require(batchId <= currentBatchNonce, "Invalid batchId for dispute");
+        require(
+            block.timestamp >= commitTimestamp,
+            "Cannot open dispute before commit timestamp"
+        );
+        require(
+            block.timestamp >= commitTimestamp,
+            "Cannot open dispute before commit timestamp"
+        );
+
         require(
             verify(
-                keccak256(abi.encodePacked(txData, nonceId, batchId)),
+                keccak256(
+                    abi.encodePacked(txData, nonceId, batchId, commitTimestamp)
+                ),
                 ownerSignature
             ) == _owner,
             "Invalid owner signature"
@@ -96,6 +136,10 @@ contract BatcherAccountable {
 
         disputes[msg.sender] = Dispute(nonceId, txData, block.timestamp);
     }
+
+      function dismissDispute(bytes32 txHash, uint8 v, bytes32 r, bytes32 s) public {
+        // 
+      }
 
     function resolveDispute(
         bytes[] calldata txDataArray,
@@ -112,9 +156,7 @@ contract BatcherAccountable {
                 keccak256(abi.encodePacked(txData)),
             "txData does not match"
         );
-        require(
-            keccak256(abi.encode(txDataArray)) == batchHashes[currentBatchNonce]
-        );
+        require(keccak256(abi.encode(txDataArray)) == batchHashes[nonceId]);
         delete disputes[disputee];
     }
 
@@ -125,8 +167,8 @@ contract BatcherAccountable {
             block.timestamp >= dispute.timestamp + 1 days,
             "Must wait 1 day after opening the dispute"
         );
-
         payable(msg.sender).transfer(1 ether);
+        depositFunds -= 1 ether;
         delete disputes[msg.sender];
     }
 

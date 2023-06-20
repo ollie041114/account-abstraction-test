@@ -12,26 +12,29 @@ box "Public Network" #LightGray
 participant "Relayer Smart Contract" as PublicRelayer
 end box
 
-User -> Owner : Initiate request
+
+User -> Owner : Initiate a request
 note left : Has private key
 Owner -> User : (batchNonce, positionNonce)
-User -> User : Generate (txData)
-User -> User : sig_user = sign(txData, batchNonce, positionNonce)
-User -> Owner : Request sig_owner
+' User -> User : Generate (txData)
 
+User -> Owner : txData
+User -> Owner : sig_user = sign (txData, batchNonce, positionNonce)
 
-Owner -> User : sig_owner = sign(txData, batchNonce, positionNonce)
 note right : Has private key
-User -> Owner : sig_user
-Owner -> LocalBlockchain : Send (txData, batchNonce, sig_user)
-LocalBlockchain -> Owner : Update state & emit events
-Owner -> User : Return result
+
+Owner -> LocalBlockchain : send (txData)
+LocalBlockchain -> Owner : Update the state & emit events
+Owner -> User : immediate feedback \n\nsig_owner = sign (txData, batchNonce, positionNonce, sendTimestamp)
+
+
 Owner -> Owner : Save to a batch \n positionNonce++
+
 
 == Asynchronously ==
 box Asynchronously
-Owner -> PublicRelayer : Send batch to public network (txData[], sig_user[], batchNonce)
+Owner -> PublicRelayer : Send batch to public network \n\nrelayTransactions (txData[], sig_user[], batchNonce)
 Owner -> Owner : batchNonce++
 end box
 
-@enduml
+@endumld

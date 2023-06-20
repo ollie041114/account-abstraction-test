@@ -7,6 +7,7 @@ box "Local Network" #LightGray
 participant "Target Smart Contract" as LocalBlockchain
 end box
 
+
 box "Public Network" #LightGray
 participant "Relayer Smart Contract" as PublicRelayer
 participant "Proxy Account" as PublicProxy
@@ -16,7 +17,8 @@ end box
 
 == Asynchronously ==
 box Asynchronously
-Owner -> PublicRelayer : Send batch to public network (txData[], sig_user[], batchNonce)
+
+Owner -> PublicRelayer : Send batch to public network \n\nrelayTransactions (txData[], sig_user[], batchNonce)
 loop i = 0; i <= n times
   PublicRelayer -> PublicRelayer: positionNonce = i
   PublicRelayer -> PublicRelayer: user_address = verify sig_user over (txData[i], batchNonce, positionNonce)

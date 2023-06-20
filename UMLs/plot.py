@@ -8,7 +8,7 @@ plt.style.use(['science'])
 plt.rcParams.update({'figure.dpi': '100'})
 
 # Load the JSON data from the file
-with open("test/ICSOC/Accountable/data.json", "r") as file:
+with open("test/ICSOC/Accountable/dataAccountable.json", "r") as file:
     data = json.load(file)
 
 # Convert the JSON data to a DataFrame

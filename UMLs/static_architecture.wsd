@@ -1,30 +1,45 @@
 @startuml
 
-actor Owner
-actor Users
 
-' Add an additional frame for Private Network
-frame "Local \nBlockchain \nSimulation" as LocalSim {
-    ' Add nested deployment of Target SC within LocalSim
-    component "Target \nSmart \nContract" as LocalTarget
-    ' Show Owner as an actor that hosts LocalSim within PrivateNet frame
+actor Owner
+
+actor "User 1" as User1
+
+actor "User 2" as User2
+
+
+frame "Server" as Server {
+    ' Add an additional frame for Private Network
+    frame "Local \nBlockchain \nSimulation" as LocalSim {
+        ' Add nested deployment of Target SC within LocalSim
+        component "Target \nSmart \nContract" as LocalTarget
+        ' Show Owner as an actor that hosts LocalSim within PrivateNet frame
+    }
 }
+
 
 frame "Public Blockchain Network" as PubNet {
     component "Relayer \nSmart \nContract" as Relayer
-    component "Proxy \nSmart \nContract" as Proxy
+    component "Proxy \nSmart \nContract 1" as Proxy1
+    component "Proxy \nSmart \nContract 2" as Proxy2
     component "Target \nSmart \nContract" as Target
 
 }
 
 left to right direction
-Users --> LocalTarget : Interact
-Users <-[dotted]- LocalTarget : Immediate response
+User1 -down-> LocalTarget : Interact
+User1 <-[dotted]- LocalTarget : Immediate response
 
-LocalSim <-l- Owner : Hosts
+User2 -> LocalTarget : Interact
+User2 <-[dotted]- LocalTarget : Immediate response
 
-LocalTarget -[dotted]-> Relayer : Batch-send
-Relayer --> Proxy : Relay
-Proxy --> Target : Call
+Server <-l- Owner : Hosts
+
+Server --> Relayer : Batch-send
+
+Relayer --> Proxy2 : Relay
+Proxy2 --> Target : Call
+Relayer --> Proxy1 : Relay
+Proxy1 --> Target : Call
 
 @enduml

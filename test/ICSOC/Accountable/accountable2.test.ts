@@ -59,7 +59,8 @@ let burnAmount = ethers.utils.parseUnits("5", 18);
 
 let hasRun = false;
 
-describe.only("ThanksPay Test 2", function () {
+
+describe("ThanksPay Test 2", function () {
     let Batcher, batcher: any, ThanksPay, thanksPay: any, creditPointsToken, owner: Signer, addr1: Signer, addr2: Signer, addr3: Signer, addr4: Signer, addr5: Signer, addrsRand: Signer, addrs: Signer;
 
     let gas1, gas2;
@@ -71,7 +72,7 @@ describe.only("ThanksPay Test 2", function () {
         await thanksPay.deployed();
 
         Batcher = await ethers.getContractFactory("BatcherAccountable");
-        batcher = await Batcher.deploy();
+        batcher = await Batcher.deploy({value: ethers.utils.parseEther("1")});
         await batcher.deployed();
 
         [owner, addr1, addr2, addr3, addr4, addr5, ...addrsRand] = await ethers.getSigners();
@@ -88,7 +89,7 @@ describe.only("ThanksPay Test 2", function () {
                 }
                 return signers
             } 
-            [...addrs] = await randomSigners(200);
+            [...addrs] = await randomSigners(250);
             hasRun = true;
 
             console.log("Getting new random signers ONLY ONCE!");
@@ -136,11 +137,9 @@ describe.only("ThanksPay Test 2", function () {
         let cost6 = await calculateGasCost(tx6);
         gasCosts[gasCosts.length - 1]["settlePartnerDebt"] = cost6;
         console.log("Gas cost for settling partner company's debt:", cost6);
-        
-
     });
 
-    const runs = [...Array(89).keys()];
+    const runs = [...Array(101).keys()];
 
     runs.forEach((i, d) => {
         it("Batch execution with size " + i, async function () {
