@@ -1,33 +1,37 @@
 @startuml
 skinparam maxMessageSize 230
 skinparam ParticipantPadding 70
+skinparam SequenceGroupBodyBackgroundColor #FFFFFF90
 
 participant User
 participant Owner
-participant Relayer
-
+' participant Relayer
+box "Public Network" #LightGreen
+participant "Relayer Smart Contract" as Relayer 
+end box
 
 Relayer -> Relayer: Store batchHash (txData[])
 
 
-User -> Relayer: Check if transactions executed correctly
+User -> Relayer: Check if transactions were executed correctly
 alt if user's txData was not included
-    User -> Relayer: openDispute (txData, positionNonce, batchNonce, sendTimestamp, ownerSignature) + **deposit**
+    User -> Relayer: openDispute (txData, positionNonce, batchNonce, sendTimestamp, sigOwner) + **deposit**
     Relayer -> Relayer: verify owner's signature \n\nverify block.timestamp > sendTimestamp 
     alt if owner's signature is valid
-        Relayer -> Owner: event - notify about opened dispute
-        Owner -> Relayer: submit (txDataArray[]) used to create batch
+        Relayer -> Owner: event - notify about the opened dispute
+        Owner -> Relayer: submit all txData[] used to create the batch
 
-        Relayer -> Relayer: verify if user's txData \n was included in the txDataArray[]
-        note left: hash(txDataArray[positionNonce])) \n == hash(txData) ?
-        Relayer -> Relayer: verify if txDataArray[] is valid against batch hash
+        Relayer -> Relayer: verify if user's txData \n was included in the txData[]
+        note left: hash(txData[positionNonce])) \n == hash(txData) ?
+        Relayer -> Relayer: verify if txData[] is valid against batch hash
         note left: hash(txData[])== hashes[batchNonce] ?
 
-        alt if txDataArray is valid
+        alt if txData[] is valid
             Relayer -> Owner: Close dispute
             Owner -> Relayer: claim DisputeCompensation (**deposit**)
             Relayer -> Owner: Transfer compensation
-        else if txDataArray[] not valid
+        else if txData[] is not valid
+            == After specified time frame passes ==
             Relayer -> User: Wait for claimDisputeCompensation
             User -> Relayer: claim DisputeCompensation (**deposit + compensation** )
             Relayer -> User: Transfer compensation

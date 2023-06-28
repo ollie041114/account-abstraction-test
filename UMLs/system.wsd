@@ -1,17 +1,17 @@
 @startuml system
 skinparam maxMessageSize 220
+skinparam SequenceGroupBodyBackgroundColor #FFFFFF90
 
 participant User
 participant Owner
 
-box "Local Network" #LightGray
+box "Local Network" #LightYellow
 participant "Target Smart Contract" as LocalBlockchain
 end box
 
-box "Public Network" #LightGray
-participant "Relayer Smart Contract" as PublicRelayer
-end box
-
+' box "Public Network" #LightGray
+' participant "Relayer Smart Contract" as PublicRelayer
+' end box
 
 User -> Owner : Initiate a request
 note left : Has private key
@@ -19,22 +19,22 @@ Owner -> User : (batchNonce, positionNonce)
 ' User -> User : Generate (txData)
 
 User -> Owner : txData
-User -> Owner : sig_user = sign (txData, batchNonce, positionNonce)
+User -> Owner : sigUser = sign (txData, batchNonce, positionNonce)
 
 note right : Has private key
 
 Owner -> LocalBlockchain : send (txData)
 LocalBlockchain -> Owner : Update the state & emit events
-Owner -> User : immediate feedback \n\nsig_owner = sign (txData, batchNonce, positionNonce, sendTimestamp)
+Owner -> User : immediate feedback \n\nsigOwner = sign (txData, batchNonce, positionNonce, sendTimestamp)
 
 
 Owner -> Owner : Save to a batch \n positionNonce++
 
 
-== Asynchronously ==
-box Asynchronously
-Owner -> PublicRelayer : Send batch to public network \n\nrelayTransactions (txData[], sig_user[], batchNonce)
-Owner -> Owner : batchNonce++
-end box
+' == Asynchronously ==
+' box Asynchronously
+' Owner -> PublicRelayer : Send batch to public network \n\nrelayTransactions (txData[], sigUser[], batchNonce)
+' Owner -> Owner : batchNonce++
+' end box
 
 @endumld

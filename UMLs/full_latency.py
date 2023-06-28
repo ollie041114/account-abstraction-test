@@ -8,7 +8,6 @@ plt.style.use(['science'])
 plt.rcParams.update({'figure.dpi': '100'})
 plt.rcParams.update({"legend.frameon": True})
 
-
 # Load JSON data for normal smart contract invocation
 with open("test/ICSOC/Accountable/latency-data/latency-data.json", "r") as f:
     normal_invocation = json.load(f)
@@ -26,6 +25,16 @@ average_normal_latencies /= 1000
 # Load JSON data for normal batching
 with open("UMLs/batch_fill_times.json", "r") as f:
     normal_batching = json.load(f)
+
+# Add 10 seconds to each "Batching" case
+def add_latency(batch_data):
+    for b in batch_data:
+        b["timeToFill"] += 10 / 60
+    return batch_data
+
+normal_batching["high"]["data"] = add_latency(normal_batching["high"]["data"])
+normal_batching["medium"]["data"] = add_latency(normal_batching["medium"]["data"])
+normal_batching["low"]["data"] = add_latency(normal_batching["low"]["data"])
 
 # Convert batch latencies to seconds and save as a list for each throughput scenario
 def convert_batch_latencies(batch_data):
@@ -56,13 +65,16 @@ ax.axhline(
 batch_sizes = [entry["batchSize"] for entry in high_batch_latencies]
 
 high_batch_times = [entry["timeToFill"] for entry in high_batch_latencies]
-ax.plot(batch_sizes, high_batch_times, 'g-', marker='o', markersize=3, label="High Throughput Batching", linestyle="-")
+ax.plot(batch_sizes, high_batch_times, 'g-', marker='', linestyle="-")
+ax.plot(batch_sizes[::10], high_batch_times[::10], 'ro', markersize=5, label="High Throughput Batching")
 
 medium_batch_times = [entry["timeToFill"] for entry in medium_batch_latencies]
-ax.plot(batch_sizes, medium_batch_times, 'g-', marker='^', markersize=3, label="Medium Throughput Batching", linestyle="--")
+ax.plot(batch_sizes, medium_batch_times, 'g-', marker='', linestyle="--")
+ax.plot(batch_sizes[::10], medium_batch_times[::10], 'bs', markersize=5, label="Medium Throughput Batching")
 
 low_batch_times = [entry["timeToFill"] for entry in low_batch_latencies]
-ax.plot(batch_sizes, low_batch_times, 'g-', marker='s', markersize=3, label="Low Throughput Batching", linestyle="-.")
+ax.plot(batch_sizes, low_batch_times, 'g-', marker='', linestyle="-.")
+ax.plot(batch_sizes[::10], low_batch_times[::10], 'm^', markersize=5, label="Low Throughput Batching")
 
 # Plot our batching
 ax.axhline(our_batching_latency, color="red", linestyle="--", label="Our solution (Avg)")
@@ -73,7 +85,7 @@ ax.tick_params(axis='y', labelcolor="blue")
 ax.set_ylabel("Latency (seconds)", color="blue")
 ax.yaxis.label.set_color("blue")
 
-# Customize y-axis tick labels for actual days and seconds
+# Customize y-axistick labels for actual days and seconds
 def log_tick_formatter(val, pos=None):
     return "{:.1f}".format(val)
 
@@ -112,10 +124,6 @@ secax.yaxis.set_major_formatter(ticker.FuncFormatter(custom_formatter))
 ax.set_xlabel("Batch Size")
 ax.set_title("Latency Comparison")
 
-# plt.xticks(np.arange(0, len(batchsizes), step=max(len(batch_sizes)//10, 1)))
 plt.legend(facecolor="white", edgecolor="black", framealpha=1, fancybox=True)
-
-# ax.spines["right"].set_color("blue")
-# ax2.spines["right"].set_color("green")
 
 plt.show()

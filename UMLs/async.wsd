@@ -1,14 +1,15 @@
 @startuml async
 skinparam maxMessageSize 220
+skinparam SequenceGroupBodyBackgroundColor #FFFFFF90
 
 participant Owner
 
-box "Local Network" #LightGray
-participant "Target Smart Contract" as LocalBlockchain
-end box
+' box "Local Network" #LightGray
+' participant "Target Smart Contract" as LocalBlockchain
+' end box
 
 
-box "Public Network" #LightGray
+box "Public Network" #LightGreen
 participant "Relayer Smart Contract" as PublicRelayer
 participant "Proxy Account" as PublicProxy
 participant "Target Smart Contract" as PublicTarget
@@ -18,15 +19,18 @@ end box
 == Asynchronously ==
 box Asynchronously
 
-Owner -> PublicRelayer : Send batch to public network \n\nrelayTransactions (txData[], sig_user[], batchNonce)
+Owner -> PublicRelayer : Send batch to public network \n\nrelayTransactions (txData[], sigUser[], batchNonce)
+
 loop i = 0; i <= n times
   PublicRelayer -> PublicRelayer: positionNonce = i
-  PublicRelayer -> PublicRelayer: user_address = verify sig_user over (txData[i], batchNonce, positionNonce)
+  PublicRelayer -> PublicRelayer: user_address = verify sigUser over (txData[i], batchNonce, positionNonce)
   PublicRelayer -> PublicProxy : Delegate txCall to ProxyAccount(user_address)
   PublicProxy -> PublicTarget : Call target smart contract
-  PublicTarget --> PublicProxy : Accept changes
+  PublicTarget --> PublicProxy : Execute transactions
+  PublicTarget --> PublicTarget : Update state
   PublicProxy --> PublicRelayer : Return true
 end
+
 PublicRelayer -> PublicRelayer: Save the hash over the executed transactions \n hashes[batchNonce] = hash(txData[])
 PublicRelayer -> Owner: emit the event
 Owner -> Owner : batchNonce++

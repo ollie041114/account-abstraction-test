@@ -1,16 +1,17 @@
 @startuml
 
-
 actor Owner
 
 actor "User 1" as User1
 
 actor "User 2" as User2
+skinparam ComponentBackgroundColor #FFFFFF90
+!define TRANSPARENT #BFFFBF
 
 
 frame "Server" as Server {
     ' Add an additional frame for Private Network
-    frame "Local \nBlockchain \nSimulation" as LocalSim {
+    frame "Local \nBlockchain \nSimulation" as LocalSim #LightYellow {
         ' Add nested deployment of Target SC within LocalSim
         component "Target \nSmart \nContract" as LocalTarget
         ' Show Owner as an actor that hosts LocalSim within PrivateNet frame
@@ -18,13 +19,13 @@ frame "Server" as Server {
 }
 
 
-frame "Public Blockchain Network" as PubNet {
+frame "Public Blockchain Network" as PubNet #LightGreen {
     component "Relayer \nSmart \nContract" as Relayer
     component "Proxy \nSmart \nContract 1" as Proxy1
     component "Proxy \nSmart \nContract 2" as Proxy2
-    component "Target \nSmart \nContract" as Target
-
+    component "Target \nSmart \nContract" as Target 
 }
+
 
 left to right direction
 User1 -down-> LocalTarget : Interact
