@@ -2,6 +2,7 @@
 skinparam maxMessageSize 230
 skinparam ParticipantPadding 70
 skinparam SequenceGroupBodyBackgroundColor #FFFFFF90
+hide footbox
 
 participant User
 participant Owner

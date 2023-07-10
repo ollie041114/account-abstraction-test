@@ -104,7 +104,7 @@ secax = ax.secondary_yaxis(
 )
 
 secax.tick_params(axis='y', labelcolor="green")
-secax.set_ylabel("Latency (days)", color="green")
+secax.set_ylabel("Latency (days)", fontsize = 20, color="green")
 secax.yaxis.label.set_color("green")
 
 # Customize secondary y-axis tick labels for actual days
@@ -121,9 +121,12 @@ def custom_formatter(val, pos=None):
 secax.yaxis.set_major_formatter(ticker.FuncFormatter(custom_formatter))
 
 # Labels and title
-ax.set_xlabel("Batch Size")
-ax.set_title("Latency Comparison")
+ax.set_xlabel("Batch Size",fontsize=20)
+ax.set_ylabel("Latency (seconds)",fontsize=20, color="blue")
+ax.set_title("Latency Comparison",fontsize=25)
 
-plt.legend(facecolor="white", edgecolor="black", framealpha=1, fancybox=True)
+plt.legend(facecolor="white", edgecolor="black", framealpha=1, fancybox=True, fontsize=15,bbox_to_anchor=(1.05, 1), loc='upper left')
+
+# plt.legend(facecolor="white", edgecolor="black", framealpha=1, fancybox=True)
 
 plt.show()

@@ -1,7 +1,7 @@
 @startuml system
 skinparam maxMessageSize 220
 skinparam SequenceGroupBodyBackgroundColor #FFFFFF90
-
+hide footbox
 participant User
 participant Owner
 

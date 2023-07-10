@@ -78,7 +78,6 @@ describe("ThanksPay Test 2", function () {
         [owner, addr1, addr2, addr3, addr4, addr5, ...addrsRand] = await ethers.getSigners();
 
         if (!hasRun) {
-
             const randomSigners = async (amount: number): Promise<Signer[]> => {
                 const signers: Signer[] = []
                 for (let i = 0; i < amount; i++) {

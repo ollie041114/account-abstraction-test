@@ -11,7 +11,7 @@ const printTxCost = async (tx, label) => {
 const commitTimestamp = Math.floor(Date.now() / 1000) + 86400; // current time + 1 day in seconds
 
 
-describe.only("Batcher interaction with and Test contracts", function () {
+describe("Batcher interaction with and Test contracts", function () {
     
     let Batcher: any, BatcherClassic: any, TestContract;
     let owner: any, user: any, user2: any;

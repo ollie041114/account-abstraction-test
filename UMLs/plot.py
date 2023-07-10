@@ -29,17 +29,24 @@ for function in size_0_prices.index:
 # Create the plots using matplotlib
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
 
+# Create a list of line styles
+line_styles = ['-', '--', '-.', ':']
+# Create a list of marker styles
+marker_styles = ['o', 'v', '^', '<', '>', 's', 'p', '*', 'h', '+', 'x', 'D']
+
 # Price of Different Functions vs Size (skipping baseline)
-for function in df.columns[1:]:
-    ax1.plot(df.loc[df['size'] != 0, 'size'], df.loc[df['size'] != 0, function], label=function)
+for i, function in enumerate(df.columns[1:]):
+    ax1.plot(df.loc[df['size'] != 0, 'size'], df.loc[df['size'] != 0, function], label=function, 
+            linestyle=line_styles[i % len(line_styles)], marker=marker_styles[i % len(marker_styles)], markevery=10)
 ax1.set_title('Absolute gas costs vs Batch Size')
 ax1.set_xlabel('Batch size')
 ax1.set_ylabel('Gas cost')
 ax1.legend()
 
 # Saving Ratio Percentage of Different Functions vs Size
-for function in df_saving_ratio.columns[1:]:
-    ax2.plot(df_saving_ratio.loc[df_saving_ratio['size'] != 0, 'size'], df_saving_ratio.loc[df_saving_ratio['size'] != 0, function], label=function)
+for i, function in enumerate(df_saving_ratio.columns[1:]):
+    ax2.plot(df_saving_ratio.loc[df_saving_ratio['size'] != 0, 'size'], df_saving_ratio.loc[df_saving_ratio['size'] != 0, function], 
+            label=function, linestyle=line_styles[i % len(line_styles)], marker=marker_styles[i % len(marker_styles)], markevery=10)
 
 # Add a horizontal line representing the baseline at 100% in the relative gas cost chart
 ax2.axhline(y=100, color='gray', linestyle='--', linewidth=1)
