@@ -39,18 +39,18 @@ async function createAndExecuteBatch(thanksPay, batcher, owner, func, paramsList
     };
 }
 
-async function enrollInBatcher(batcher, accounts) {
-    const enrollPromises = accounts.map((account) => {
-        return batcher.connect(account).enroll(account.address);
-    });
-    await Promise.all(enrollPromises);
+// async function enrollInBatcher(batcher, accounts) {
+//     const enrollPromises = accounts.map((account) => {
+//         return batcher.connect(account).enroll(account.address);
+//     });
+//     await Promise.all(enrollPromises);
 
-    const throwAwayAccounts = await Promise.all(
-        accounts.map((account) => batcher.throwawayAccounts(account.address))
-    );
+//     const throwAwayAccounts = await Promise.all(
+//         accounts.map((account) => batcher.throwawayAccounts(account.address))
+//     );
 
-    return throwAwayAccounts;
-}
+//     return throwAwayAccounts;
+// }
 
 
 let salaryAmount = ethers.utils.parseUnits("15", 18);
@@ -60,20 +60,20 @@ let burnAmount = ethers.utils.parseUnits("5", 18);
 let hasRun = false;
 
 
-describe("ThanksPay Test 2", function () {
+describe.only("ThanksPay Test 2", function () {
     let Batcher, batcher: any, ThanksPay, thanksPay: any, creditPointsToken, owner: Signer, addr1: Signer, addr2: Signer, addr3: Signer, addr4: Signer, addr5: Signer, addrsRand: Signer, addrs: Signer;
 
     let gas1, gas2;
     beforeEach(async function () {
         this.timeout(0);
 
-        ThanksPay = await ethers.getContractFactory("ThanksPaySalaryToken");
-        thanksPay = await ThanksPay.deploy();
-        await thanksPay.deployed();
-
         Batcher = await ethers.getContractFactory("BatcherAccountable");
         batcher = await Batcher.deploy({value: ethers.utils.parseEther("1")});
         await batcher.deployed();
+
+        ThanksPay = await ethers.getContractFactory("ThanksPaySalaryToken");
+        thanksPay = await ThanksPay.deploy(batcher.address);
+        await thanksPay.deployed();
 
         [owner, addr1, addr2, addr3, addr4, addr5, ...addrsRand] = await ethers.getSigners();
 
@@ -153,12 +153,12 @@ describe("ThanksPay Test 2", function () {
 
             // Enroll all accounts in the Batching service and get their ThrowawayAccounts
             const allAccounts = [ownerAccount, ...companyAccounts, ...workerAccounts];
-            const throwAwayAccounts = await enrollInBatcher(batcher, allAccounts);
+            // const throwAwayAccounts = await enrollInBatcher(batcher, allAccounts);
 
             // Separate ThrowawayAccounts into owner, companies, and workers
-            const throwAwayOwner = throwAwayAccounts[0];
-            const throwAwayCompanies = throwAwayAccounts.slice(1, numCompanies + 1);
-            const throwAwayWorkers = throwAwayAccounts.slice(numCompanies + 1);
+            // const throwAwayOwner = throwAwayAccounts[0];
+            // const throwAwayCompanies = throwAwayAccounts.slice(1, numCompanies + 1);
+            // const throwAwayWorkers = throwAwayAccounts.slice(numCompanies + 1);
 
             console.log("Actual throwaway: throwAwayOwner");
 
@@ -167,24 +167,24 @@ describe("ThanksPay Test 2", function () {
                 {
                     name: "addPartnerCompany",
                     func: thanksPay.populateTransaction.addPartnerCompany,
-                    paramsList: throwAwayCompanies.map((account) => [
-                        account,
+                    paramsList: companyAccounts.map((account: any) => [
+                        account.address,
                     ]),
                     signerList: Array(numCompanies).fill(ownerAccount),
                 },
                 {
                     name: "addWorker",
                     func: thanksPay.populateTransaction.addWorker,
-                    paramsList: throwAwayWorkers.map((worker) => [
-                        worker,
+                    paramsList: workerAccounts.map((worker: any) => [
+                        worker.address,
                     ]),
                     signerList: Array(numWorkers).fill(ownerAccount),
                 },
                 {
                     name: "mintTokens",
                     func: thanksPay.populateTransaction.mintTokens,
-                    paramsList: throwAwayWorkers.map((worker, index) => [
-                        worker,
+                    paramsList: workerAccounts.map((worker: any, index: any) => [
+                        worker.address,
                         mintAmount,
                     ]),
                     signerList: companyAccounts,
@@ -192,17 +192,17 @@ describe("ThanksPay Test 2", function () {
                 {
                     name: "burnTokens",
                     func: thanksPay.populateTransaction.burnTokens,
-                    paramsList: throwAwayWorkers.map((worker, index) => [
+                    paramsList: workerAccounts.map((worker: any, index: any) => [
                         burnAmount,
-                        throwAwayCompanies[index],
+                        companyAccounts[index].address,
                     ]),
                     signerList: workerAccounts,
                 },
                 {
                     name: "settlePartnerDebt",
                     func: thanksPay.populateTransaction.settlePartnerDebt,
-                    paramsList: throwAwayCompanies.map((company, index) => [
-                        company
+                    paramsList: companyAccounts.map((company: any, index: any) => [
+                        company.address
                     ]),
                     signerList: Array(numWorkers).fill(ownerAccount),
                 },

@@ -90,21 +90,44 @@ contract BatcherAccountable {
         bytes[] calldata txArray,
         bytes[] calldata sigs,
         uint256 batchNonce
-    ) public onlyIfFunded()
-    {
+    ) public onlyIfFunded {
         address msgSender;
-        bytes32 Msg;
+        bytes32 msgHash;
         for (uint256 i = 0; i < txArray.length; ++i) {
-            Msg = keccak256(abi.encodePacked(txArray[i], batchNonce, i));
-            msgSender = verify(Msg, sigs[i]);
-            address throwawayAccountAddr = throwawayAccounts[msgSender];
+            msgHash = keccak256(abi.encodePacked(txArray[i], batchNonce, i));
+            msgSender = verify(msgHash, sigs[i]);
+            // address throwawayAccountAddr = throwawayAccounts[msgSender];
 
-            bool success = ThrowawayAccount(throwawayAccountAddr).executeTransaction(contractAddr, txArray[i]);
+            (bool success, ) = contractAddr.call(
+                abi.encodePacked(txArray[i], msgSender)
+            );
+
+            // bool success = ThrowawayAccount(throwawayAccountAddr).executeTransaction(contractAddr, txArray[i]);
             require(success, "Transaction execution failed");
         }
         batchHashes[batchNonce] = keccak256(abi.encode(txArray));
         // currentBatchNonce = batchNonce;
     }
+
+    //     function dispatch(
+    //     address[] calldata contractAddrs,
+    //     bytes[] calldata args,
+    //     bytes[] calldata sigs
+    // ) public {
+    //     address msgSender;
+    //     bytes32 msgHash;
+    //     for (uint i = 0; i < contractAddrs.length; i++) {
+    //         msgHash = keccak256(abi.encodePacked(contractAddrs[i], args[i]));
+    //         msgSender = verify(msgHash, sigs[i]);
+    //         console.log("msgSender in dispatch");
+    //         console.log(msgSender);
+
+    //         (bool success, ) = contractAddrs[i].call(
+    //             abi.encodePacked(args[i], msgSender)
+    //         );
+    //         require(success, "Stuff");
+    //     }
+    // }
 
     function openDispute(
         bytes calldata txData,
@@ -137,9 +160,14 @@ contract BatcherAccountable {
         disputes[msg.sender] = Dispute(nonceId, txData, block.timestamp);
     }
 
-      function dismissDispute(bytes32 txHash, uint8 v, bytes32 r, bytes32 s) public {
+    function dismissDispute(
+        bytes32 txHash,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) public {
         // 
-      }
+    }
 
     function resolveDispute(
         bytes[] calldata txDataArray,

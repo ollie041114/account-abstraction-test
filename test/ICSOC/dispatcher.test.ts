@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 
 
-describe.only("Batcher Contract", function() {
+describe("Batcher Contract", function() {
   it("Can verify and dispatch", async function() {
     const Batcher = await ethers.getContractFactory("batcher");
     const batcher = await Batcher.deploy();
