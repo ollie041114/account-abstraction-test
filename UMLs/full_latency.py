@@ -125,7 +125,7 @@ ax.set_xlabel("Batch Size",fontsize=20)
 ax.set_ylabel("Latency (seconds)",fontsize=20, color="blue")
 ax.set_title("Latency Comparison",fontsize=25)
 
-plt.legend(facecolor="white", edgecolor="black", framealpha=1, fancybox=True, fontsize=15,bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.legend(facecolor="white", edgecolor="black", framealpha=1, fancybox=True, fontsize=15, bbox_to_anchor=(1.10, 0), loc='lower left')
 
 # plt.legend(facecolor="white", edgecolor="black", framealpha=1, fancybox=True)
 

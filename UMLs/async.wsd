@@ -12,7 +12,6 @@ participant Owner
 
 box "Public Network" #LightGreen
 participant "Relayer Smart Contract" as PublicRelayer
-participant "Proxy Account" as PublicProxy
 participant "Target Smart Contract" as PublicTarget
 end box
 
@@ -25,11 +24,12 @@ Owner -> PublicRelayer : Send batch to public network \n\nrelayTransactions (txD
 loop i = 0; i <= n times
   PublicRelayer -> PublicRelayer: positionNonce = i
   PublicRelayer -> PublicRelayer: user_address = verify sigUser over (txData[i], batchNonce, positionNonce)
-  PublicRelayer -> PublicProxy : Delegate txCall to ProxyAccount(user_address)
-  PublicProxy -> PublicTarget : Call target smart contract
-  PublicTarget --> PublicProxy : Execute transactions
-  PublicTarget --> PublicTarget : Update state
-  PublicProxy --> PublicRelayer : Return true
+
+  PublicRelayer -> PublicTarget : Relay txData \n+ user_address
+
+  PublicTarget -> PublicTarget : _msgSender() = user_address
+  PublicTarget --> PublicTarget : Execute transactions, update state
+  PublicTarget --> PublicRelayer : Return true
 end
 
 PublicRelayer -> PublicRelayer: Save the hash over the executed transactions \n hashes[batchNonce] = hash(txData[])
